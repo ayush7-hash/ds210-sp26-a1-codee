@@ -85,5 +85,7 @@ fn main() {
 
     // These parts do not work unless you implement push and remove correctly.
     slow_vec_push();
+
     slow_vec_remove();
+    
 }
