@@ -70,14 +70,23 @@ impl<T> SlowVec<T> {
     }
     
     pub fn remove(&mut self, i: usize) {
-        let mut removed = self.move_out(i);
-        for j in i..self.len()-1 {
-            let mut temp = self.move_out(j+1);
-            self.put(temp, j);
-        }
+    // create new array with size -1
+    let mut new_fixed = FixedSizeArray::allocate(self.fixed.len() - 1);
 
-        return removed;
+    let mut new_index = 0;
+
+    // copy everything except index i
+    for j in 0..self.fixed.len() {
+        let value = self.fixed.move_out(j);
+
+        if j != i {
+            new_fixed.put(value, new_index);
+            new_index += 1;
+        }
     }
+
+    // replace old array
+    self.fixed = new_fixed;
 }
 
 
