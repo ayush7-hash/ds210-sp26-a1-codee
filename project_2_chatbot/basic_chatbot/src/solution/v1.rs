@@ -13,7 +13,7 @@ impl ChatbotV1 {
 
     #[allow(dead_code)]
     pub async fn chat_with_user(&mut self, message: String) -> String {
-        let chat_session: Chat<Llama> = self.model
+        let mut chat_session: Chat<Llama> = self.model
             .chat()
             .with_system_prompt("The assistant will act like a pirate");
 
@@ -23,10 +23,6 @@ impl ChatbotV1 {
             Ok(reply) => reply,
             Err(_) => String::from("Sorry, I ran into an error while responding."),
         }
-        println!("{message}");
-        let asynchronous_output: ChatResponseBuilder<'_, Llama> = chat_session.add_message(message);
-        let output: String = asynchronous_output.await.unwrap();
-        output.to_string()
        
         // You need to add your code here
         // You must find a way to add the given message to the chat_session!
