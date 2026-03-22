@@ -18,6 +18,17 @@ pub fn save_chat_session_to_file(filename: &str, session: &LlamaChatSession) {
 
 // Implement this
 pub fn load_chat_session_from_file(filename: &str) -> Option<LlamaChatSession> {
+    let bytes = match std::fs::read(filename) {
+        Ok(b) => b,
+        Err(_) => return None,
+    };
+
+    let session = match LlamaChatSession::from_bytes(&bytes) {
+        Ok(s) => s,
+        Err(_) => return None,
+    };
+
+    return Some(session);
     // look at fs::read(...)
     // also look at LlamaChatSession::from_bytes(...)
     unimplemented!("Loading chat session from file {filename}");
