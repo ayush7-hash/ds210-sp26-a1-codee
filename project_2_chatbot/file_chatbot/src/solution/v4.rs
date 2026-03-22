@@ -19,27 +19,24 @@ impl ChatbotV4 {
         .chat()
         .with_system_prompt("The assistant will act like a pirate");
 
-    // Load previous session
+    // Load previous session if it exists
     match file_library::load_chat_session_from_file(&filename) {
-        None => {}
+        None => {
+            // No previous session → use fresh chat_session
+        }
         Some(session) => {
             chat_session = chat_session.with_session(session);
         }
     }
 
-    // Get response
+    // Send message and get response
     let response = chat_session
         .add_message(message)
         .await
-        .expect("Failed to generate response");
+        .map(|msg| format!("{:?}: {}" , msg.role() , msg.content()));
 
-    // Get session
-    let session = chat_session
-        .session()
-        .expect("Failed to get session");
-
-    // Save session
-    file_library::save_chat_session_to_file(&filename, &session);
+    // Save updated session
+    file_library::save_chat_session_to_file(&filename, chat_session.session());
 
     return response;
 }
@@ -53,11 +50,7 @@ impl ChatbotV4 {
             },
             Some(session) => {
                 // TODO: what should happen here?
-                return session
-                    .history()
-                    .iter()
-                    .map(|msg| format!("{:?}: {}", msg.role(), msg.content()))
-                    .collect();
+                return Vec::new();
             }
         }
     }
