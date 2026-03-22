@@ -14,7 +14,6 @@ impl ChatbotV4 {
 
     pub async fn chat_with_user(&mut self, username: String, message: String) -> String {
     let filename = &format!("{}.txt", username);
-    let filename = &format!("{}.txt", username);
 
     let mut chat_session: Chat<Llama> = self.model
         .chat()
@@ -43,7 +42,7 @@ impl ChatbotV4 {
         .expect("Failed to get session");
 
     // Save session
-    file_library::save_chat_session_to_file(&filename, &session);
+    file_library::save_chat_session_to_file(&filename, &*session);
 
     return response;
 }
@@ -57,7 +56,11 @@ impl ChatbotV4 {
             },
             Some(session) => {
                 // TODO: what should happen here?
-                return Vec::new();
+                return session
+                    .history()
+                    .iter()
+                    .map(|msg| format!("{:?}: {}", msg.role(), msg.content()))
+                    .collect();
             }
         }
     }
