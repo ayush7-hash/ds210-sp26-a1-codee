@@ -11,8 +11,11 @@ use std::fs;
 // for some examples!
 
 // Implement this
-pub fn save_chat_session_to_file(filename: &str, session: &LlamaChatSession) {
-    let bytes = session.to_bytes();
+pub fn save_chat_session_to_file(filename: &str, session: &LlamaSession) {
+    let bytes = session
+        .to_bytes()
+        .expect("Failed to convert chat session to bytes");
+
     fs::write(filename, bytes).expect("Failed to write chat session to file");
 }
 
