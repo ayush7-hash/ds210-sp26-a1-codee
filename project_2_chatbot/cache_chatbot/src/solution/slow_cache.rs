@@ -36,8 +36,13 @@ impl<V> Cache<V> {
         // println!("Removing least recently used");
     }
     fn mark_as_most_recently_used(&mut self, username: String) {
-        // TODO: your code goes here.
-        // println!("Marking {username} as most recently used");
+        // Step 1: find if username already exists
+        if let Some(pos) = self.usage_history.iter().position(|u| *u == username) {
+        // Step 2: remove it from current position
+            self.usage_history.remove(pos);
+        }
+        // Step 3: push to back (most recent)
+        self.usage_history.push(username);
     }
 
     // Reading from the cache:
