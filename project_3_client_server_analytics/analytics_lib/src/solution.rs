@@ -19,6 +19,7 @@ pub fn evaluate_condition(row: &Row, condition: &Condition, dataset: &Dataset) -
             }
         }
     }
+
 pub fn filter_dataset(dataset: &Dataset, filter: &Condition) -> Dataset {
     let mut filtered = Dataset::new(dataset.columns().clone());
 
@@ -49,7 +50,44 @@ pub fn group_by_dataset(dataset: Dataset, group_by_column: &String) -> HashMap<V
 }
 
 pub fn aggregate_dataset(dataset: HashMap<Value, Dataset>, aggregation: &Aggregation) -> HashMap<Value, Value> {
-    todo!("Implement this!");
+    let col_name = match aggregation {
+        Aggregation::Count(col)   => col,
+        Aggregation::Sum(col)     => col,
+        Aggregation::Average(col) => col,
+    };
+
+    dataset
+        .into_iter()
+        .map(|(key, group)| {
+            let value = match aggregation {
+                Aggregation::Count(_) => Value::Integer(group.len() as i32),
+                Aggregation::Sum(_) => {
+                    let col_index = group.column_index(col_name);
+                    let sum: i32 = group.iter()
+                        .map(|row| row.get_value(col_index))
+                        .filter_map(|val| match val {
+                            Value::Integer(i) => Some(i),
+                            _ => None,
+                        })
+                        .sum();
+                    Value::Integer(sum)
+                }
+                Aggregation::Average(_) => {
+                    let col_index = group.column_index(col_name);
+                    let sum: i32 = group.iter()
+                        .map(|row| row.get_value(col_index))
+                        .filter_map(|val| match val {
+                            Value::Integer(i) => Some(i),
+                            _ => None,
+                        })
+                        .sum();
+                    let count = group.len() as i32;
+                    Value::Integer(sum / count)
+                }
+            };
+            (key, value)
+        })
+        .collect()
 }
 
 pub fn compute_query_on_dataset(dataset: &Dataset, query: &Query) -> Dataset {
